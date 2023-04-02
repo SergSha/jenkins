@@ -175,35 +175,50 @@ systemctl restart jenkins
 
 Для установки плагина, например, Git, зайдём на страницу https://www.jenkins.io/  и кликаем по ссылке "Plugins", затем в поле набираем "git':
 
+<img src="./images/Screenshot from 2023-04-02 21-59-26.png" />
 
 
+Затем выбираем самый первый, где большее число установок:
+
+<img src="./images/Screenshot from 2023-04-02 22-08-34.png" />
 
 
+Кликаем по ссылке "Releases":
+
+<img src="./images/Screenshot from 2023-04-02 22-12-20.png" />
 
 
+Кликаем правой кнопкой мыши по ссылке "direct link":
+
+<img src="./images/Screenshot from 2023-04-02 22-27-35.png" />
 
 
+В контекстном меню выбираем [Copy link].
+
+На странице управления Jenkins в "Manage Jenkins" > "Plugins" > "Advanced settings", в секции "Deploy Plugin" в поле URL вставляем скоипрованную ссылку и кликаем [Deploy]:
+
+<img src="./images/Screenshot from 2023-04-02 22-37-15.png" />
 
 
+Идёт процесс установки выбранного плагина и его зависимости:
+
+<img src="./images/Screenshot from 2023-04-02 22-39-28.png" />
 
 
+Ставим галочку "Restart Jenkins when installation is complete and no jobs are running":
+
+<img src="./images/Screenshot from 2023-04-02 22-40-56.png" />
 
 
+После рестарта авторизуемся:
+
+<img src="./images/Screenshot from 2023-04-02 22-47-19.png" />
 
 
+Заходим в "Manage Jenkins" > "Plugins" > "Installed plugins", убедимся, что плагин Git установлен:
 
+<img src="./images/Screenshot from 2023-04-02 22-52-34.png" />
 
-java -jar jenkins-plugin-manager-*.jar --war /your/path/to/jenkins.war --plugin-file /your/path/to/plugins.txt --plugins delivery-pipeline-plugin:1.3.2 deployit-plugin
-
-
-https://github.com/jenkinsci/plugin-installation-manager-tool/releases/latest
-
-
-
-
-
-
- "Manage Jenkins" > "Plugins" > "Advanced settings"
 
 
 
