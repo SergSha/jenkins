@@ -173,7 +173,37 @@ systemctl restart jenkins
 
 ### Управление Plugins
 
+Для установки плагина, например, Git, зайдём на страницу https://www.jenkins.io/  и кликаем по ссылке "Plugins", затем в поле набираем "git':
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+java -jar jenkins-plugin-manager-*.jar --war /your/path/to/jenkins.war --plugin-file /your/path/to/plugins.txt --plugins delivery-pipeline-plugin:1.3.2 deployit-plugin
+
+
+https://github.com/jenkinsci/plugin-installation-manager-tool/releases/latest
+
+
+
+
+
+
+ "Manage Jenkins" > "Plugins" > "Advanced settings"
 
 
 
