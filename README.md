@@ -1,6 +1,6 @@
-# JENKINS
+## JENKINS
 
-## Установка Jenkins
+### Установка Jenkins
 
 Jenkins
 https://www.jenkins.io/
@@ -13,7 +13,7 @@ https://www.jenkins.io/doc/book/installing/
 
 
 Версия ОС:
-
+...
 root@server1:~# cat /etc/os-release 
 PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
 NAME="Debian GNU/Linux"
@@ -25,7 +25,7 @@ HOME_URL="https://www.debian.org/"
 SUPPORT_URL="https://www.debian.org/support"
 BUG_REPORT_URL="https://bugs.debian.org/"
 root@server1:~# 
-
+...
 
 Зададим свой часовой пояс:
 
@@ -134,7 +134,7 @@ root@server1:~# cat /var/lib/jenkins/secrets/initialAdminPassword
 <img src="./images/Screenshot from 2023-04-02 17-33-36.png" />
 
 
-## Администрирование Jenkins
+### Администрирование Jenkins
 
 В "Manage Jenkins" > "System" уберём галочку в "Help make Jenkins better by sending anonymous usage statistics and crash reports to the Jenkins project" и кликаем [Save]:
 
@@ -171,7 +171,7 @@ root@server1:/usr/share/java# systemctl restart jenkins
 root@server1:/usr/share/java# 
 
 
-## Управление Plugins
+### Управление Plugins
 
 
 
