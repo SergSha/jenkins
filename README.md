@@ -28,59 +28,59 @@ root@server1:~#
 ```
 
 Зададим свой часовой пояс:
-
+```
 root@server1:~# timedatectl set-timezone Europe/Moscow
-
+```
 
 Установим службу для синхронизации времени:
-
+```
 root@server1:~# apt install chrony
-
+```
 
 Запустим chrony и разрешим ее автозапуск:
-
+```
 systemctl enable --now chrony
-
+```
 
 При настройке firewall (iptables, nftables) необходимо открыть порт 8080, на котором работает Jenkins, в частности:
-
+```
 root@server1:~# iptables -I INPUT -p tcp —dport 8080 -j ACCEPT
-
+```
 
 Обновим список обновлений:
-
+```
 root@server1:~# apt update
-
+```
 
 Установим Java:
-
+```
 root@server1:~# apt install openjdk-11-jre
-
+```
 
 Версия установленной Java:
-
+```
 root@server1:~# java -version
 openjdk version "11.0.18" 2023-01-17
 OpenJDK Runtime Environment (build 11.0.18+10-post-Debian-1deb11u1)
 OpenJDK 64-Bit Server VM (build 11.0.18+10-post-Debian-1deb11u1, mixed mode, sharing)
 root@server1:~# 
-
+```
 
 Собственно, сама установка:
-
+```
 root@server1:~# wget -qO - https://pkg.jenkins.io/debian/jenkins.io-2023.key | cat - > /usr/share/keyrings/jenkins-keyring.asc
-
-
+```
+```
 root@server1:~# echo 'deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/' > /etc/apt/sources.list.d/jenkins.list
-
-
+```
+```
 root@server1:~# apt install jenkins
-
+```
 
 Убедимся, что jenkins запустился:
-
+```
 root@server1:~# systemctl status jenkins.service 
-
+```
 
 В адресной строке браузера вводим http://192.168.56.101:8080:
 
@@ -88,9 +88,9 @@ root@server1:~# systemctl status jenkins.service
 
 
 Скопируем пароль с файла /var/lib/jenkins/secrets/initialAdminPassword:
-
+```
 root@server1:~# cat /var/lib/jenkins/secrets/initialAdminPassword
-
+```
 
 и вставим в поле [Administrator password] в браузере и кликаем [Continue]:
 
@@ -149,27 +149,27 @@ root@server1:~# cat /var/lib/jenkins/secrets/initialAdminPassword
 Чтобы обновить версию Jenkins, зайдём в директорий, указанный в "Manage Jenkins" > "System Information":
 
 <img src="./images/Screenshot from 2023-04-02 18-29-05.png" />
-
+```
 root@server1:~# cd /usr/share/java/
 root@server1:/usr/share/java#
-
+```
 
 Переименуем файл jenkins.war, например, в конце имени файла добавим ноиер версии:
-
+```
 root@server1:/usr/share/java# mv ./jenkins.war ./jenkins-2.397.war 
 root@server1:/usr/share/java# 
-
+```
 
 и в этот директорий скачаем новую версию, например:
-
+```
 root@server1:/usr/share/java# wget -O jenkins.war http://update.jenkins-ci.org/download/war/2.398/jenkins.war
-
+```
 
 Перезапускаем Jenkins сервис:
-
+```
 root@server1:/usr/share/java# systemctl restart jenkins 
 root@server1:/usr/share/java# 
-
+```
 
 ### Управление Plugins
 
