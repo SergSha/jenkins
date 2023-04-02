@@ -149,6 +149,7 @@ root@server1:~# cat /var/lib/jenkins/secrets/initialAdminPassword
 Чтобы обновить версию Jenkins, зайдём в директорий, указанный в "Manage Jenkins" > "System Information":
 
 <img src="./images/Screenshot from 2023-04-02 18-29-05.png" />
+
 ```
 root@server1:~# cd /usr/share/java/
 root@server1:/usr/share/java#
