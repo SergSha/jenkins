@@ -13,7 +13,7 @@ https://www.jenkins.io/doc/book/installing/
 
 
 Версия ОС:
-...
+```
 root@server1:~# cat /etc/os-release 
 PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
 NAME="Debian GNU/Linux"
@@ -25,7 +25,7 @@ HOME_URL="https://www.debian.org/"
 SUPPORT_URL="https://www.debian.org/support"
 BUG_REPORT_URL="https://bugs.debian.org/"
 root@server1:~# 
-...
+```
 
 Зададим свой часовой пояс:
 
