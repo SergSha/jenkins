@@ -220,7 +220,7 @@ systemctl restart jenkins
 <img src="./images/Screenshot from 2023-04-02 22-52-34.png" />
 
 
-
+### Просейшие Jobs, включая Deployment
 
 
 
