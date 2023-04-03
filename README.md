@@ -222,10 +222,136 @@ systemctl restart jenkins
 
 ### Просейшие Jobs, включая Deployment
 
+Создадим новый job. Кликаем на [Create a job]:
+
+<img src="./images/Screenshot from 2023-04-03 19-35-15.png" />
+
+или [+ New Item]:
+
+<img src="./images/Screenshot from 2023-04-03 19-36-16.png" />
 
 
+Вводим имя нового job, например, MyJob-01, выбираем "Freestyle project" и нажимаем [OK]:
+
+<img src="./images/Screenshot from 2023-04-03 19-43-42.png" />
 
 
+Вводим пока Description:
+
+<img src="./images/Screenshot from 2023-04-03 19-48-47.png" />
+
+<img src="./images/Screenshot from 2023-04-03 19-49-17.png" />
+
+
+Из списка [Build step] выбираем "Execute shell":
+
+<img src="./images/Screenshot from 2023-04-03 19-54-43.png" />
+
+
+В поле "Command" вводим какую-нибудь стандартную команду Linux, например:
+```
+echo "Hello World!"
+```
+<img src="./images/Screenshot from 2023-04-03 19-58-47.png" />
+
+и нажимаем [Save].
+
+<img src="./images/Screenshot from 2023-04-03 20-01-13.png" />
+
+Теперь на главной странице отображается новый job:
+
+<img src="./images/Screenshot from 2023-04-03 20-02-32.png" />
+
+
+Для запуска нужно кликнуть [Build Now]:
+
+<img src="./images/Screenshot from 2023-04-03 20-31-11.png" />
+
+
+Для того чтобы увидеть результат действия job, кликаем [Console Output]:
+
+<img src="./images/Screenshot from 2023-04-03 20-34-34.png" />
+
+И видим в консоли вывод "Hello World!":
+
+<img src="./images/Screenshot from 2023-04-03 20-37-13.png" />
+
+
+Добавим в этот job что-нибудь ещё:
+
+<img src="./images/Screenshot from 2023-04-03 20-43-12.png" />
+
+Если кликнуть по ссылке "See the list of available environment variables":
+
+<img src="./images/Screenshot from 2023-04-03 20-45-33.png" />
+
+то увидим список переменных:
+
+<img src="./images/Screenshot from 2023-04-03 20-47-22.png" />
+
+
+Вот и добавим в "Build Steps" - "Execute shell" - "Command" ещё строку, например:
+```
+echo "This is Build number $BUILD_NUMBER"
+```
+<img src="./images/Screenshot from 2023-04-03 20-55-18.png" />
+
+и кликаем [Save].
+
+
+Запустим Build [Build Now] и смотрим результат вывода [Console Output]:
+
+<img src="./images/Screenshot from 2023-04-03 21-00-23.png" />
+
+
+Добавим ещё несколько строк в "Build Steps" - "Execute shell" - "Command":
+```
+echo "Hello World!"
+echo "This is Build number $BUILD_NUMBER"
+pwd
+sleep 5
+whoami
+sleep 5
+echo "Nmae of this Build is $BUILD_DISPLAY_NAME"
+```
+<img src="./images/Screenshot from 2023-04-03 21-13-53.png" />
+
+Для того чтобы build-ы моглы выполняться одновременно, в настройке Job поставим галочку в "Execute concurrent builds if necessary":
+
+<img src="./images/Screenshot from 2023-04-03 21-18-33.png" />
+
+и нажимаем [Save].
+
+Несколько раз нажмём "Build Now" и смотрим "Build Executor Status" в левой части страницы:
+
+<img src="./images/Screenshot from 2023-04-03 21-23-18.png" />
+
+Наблюдаем параллельное выполнение build-ов.
+
+Результат вывода:
+
+<img src="./images/Screenshot from 2023-04-03 21-26-52.png" />
+
+
+Добавим команду, которая выведет ошибку, например:
+```
+cat /etc/nofoundfile.txt
+```
+т.е. попытаемся вывести на экран содержимое несуществующего файла.
+
+<img src="./images/Screenshot from 2023-04-03 21-32-54.png" />
+
+
+Запустим [Build Now] и наблюдаем, что вместо зелёной галочки в кружочке получим красный крестик, и появилось уведомление в графе "Last Failure":
+
+<img src="./images/Screenshot from 2023-04-03 21-38-02.png" />
+
+Смотрим консоль [Console Output]:
+
+<img src="./images/Screenshot from 2023-04-03 21-40-38.png" />
+
+
+10:22
 
 
 
