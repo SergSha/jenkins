@@ -350,8 +350,155 @@ cat /etc/nofoundfile.txt
 
 <img src="./images/Screenshot from 2023-04-03 21-40-38.png" />
 
-
 10:22
+
+Теперь удалим строку с командой, вызывающую ошибку.
+
+
+Установим плагин, который добавит в правой и нижней части страницы изображение. Например, плагин "ChuckNorris" с изображением Чака Норриса. Затем в конфигурации Job "Configure" - "Post-build Actions" из списка выбираем "Activate ChuckNorris" 
+
+<img src="./images/Screenshot from 2023-04-04 20-46-19.png" />
+
+и нажимаем [Save] и получим следующее:
+
+<img src="./images/Screenshot from 2023-04-04 20-49-05.png" />
+
+
+Файлы Jenkis хранятся в директории /var/lib/jenkins/:
+```
+root@server1:~# ls -l /var/lib/jenkins/
+total 124
+-rw-r--r--  1 jenkins jenkins 1800 Apr  4 20:30 config.xml
+-rw-r--r--  1 jenkins jenkins  156 Apr  4 20:30 hudson.model.UpdateCenter.xml
+-rw-r--r--  1 jenkins jenkins  370 Apr  2 22:39 hudson.plugins.git.GitTool.xml
+-rw-r--r--  1 jenkins jenkins   76 Apr  2 18:02 hudson.tasks.Shell.xml
+-rw-r--r--  1 jenkins jenkins  216 Apr  2 18:02 hudson.triggers.SCMTrigger.xml
+-rw-------  1 jenkins jenkins 1680 Apr  2 22:39 identity.key.enc
+-rw-r--r--  1 jenkins jenkins  277 Apr  2 18:02 jenkins.fingerprints.GlobalFingerprintConfiguration.xml
+-rw-r--r--  1 jenkins jenkins    5 Apr  4 20:30 jenkins.install.InstallUtil.lastExecVersion
+-rw-r--r--  1 jenkins jenkins    5 Apr  2 17:33 jenkins.install.UpgradeWizard.state
+-rw-r--r--  1 jenkins jenkins  159 Apr  2 18:02 jenkins.model.ArtifactManagerConfiguration.xml
+-rw-r--r--  1 jenkins jenkins  253 Apr  2 18:02 jenkins.model.GlobalBuildDiscarderConfiguration.xml
+-rw-r--r--  1 jenkins jenkins  265 Apr  2 18:02 jenkins.model.JenkinsLocationConfiguration.xml
+-rw-r--r--  1 jenkins jenkins  169 Apr  2 18:09 jenkins.security.QueueItemAuthenticatorConfiguration.xml
+-rw-r--r--  1 jenkins jenkins   86 Apr  2 18:02 jenkins.security.ResourceDomainConfiguration.xml
+-rw-r--r--  1 jenkins jenkins  162 Apr  2 18:09 jenkins.security.UpdateSiteWarningsConfiguration.xml
+-rw-r--r--  1 jenkins jenkins  357 Apr  2 18:09 jenkins.security.apitoken.ApiTokenPropertyConfiguration.xml
+-rw-r--r--  1 jenkins jenkins  179 Apr  2 18:02 jenkins.tasks.filters.EnvVarsFilterGlobalConfiguration.xml
+-rw-r--r--  1 jenkins jenkins  171 Apr  2 13:27 jenkins.telemetry.Correlator.xml
+drwxr-xr-x  3 jenkins jenkins 4096 Apr  3 19:46 jobs
+drwxr-xr-x  3 jenkins jenkins 4096 Apr  2 15:20 logs
+-rw-r--r--  1 jenkins jenkins  907 Apr  4 20:30 nodeMonitors.xml
+drwxr-xr-x  2 jenkins jenkins 4096 Apr  2 13:27 nodes
+drwxr-xr-x 28 jenkins jenkins 4096 Apr  4 20:40 plugins
+-rw-r--r--  1 jenkins jenkins  129 Apr  4 20:40 queue.xml
+-rw-r--r--  1 jenkins jenkins  129 Apr  3 21:45 queue.xml.bak
+-rw-r--r--  1 jenkins jenkins   64 Apr  2 13:27 secret.key
+-rw-r--r--  1 jenkins jenkins    0 Apr  2 13:27 secret.key.not-so-secret
+drwx------  2 jenkins jenkins 4096 Apr  3 20:36 secrets
+drwxr-xr-x  2 jenkins jenkins 4096 Apr  4 20:31 updates
+drwxr-xr-x  2 jenkins jenkins 4096 Apr  2 13:27 userContent
+drwxr-xr-x  3 jenkins jenkins 4096 Apr  2 17:29 users
+drwxr-xr-x  4 jenkins jenkins 4096 Apr  3 21:23 workspace
+root@server1:~#
+```
+
+Особенно растёт количество файлов при запуска job в директории /var/lib/jenkins/jobs:
+```
+root@server1:~# ls -l /var/lib/jenkins/jobs/
+total 4
+drwxr-xr-x 3 jenkins jenkins 4096 Apr  4 20:46 MyJob-01
+root@server1:~#
+```
+
+```
+root@server1:~# ls -l /var/lib/jenkins/jobs/MyJob-01/builds/
+total 32
+drwxr-xr-x 2 jenkins jenkins 4096 Apr  3 20:32 1
+drwxr-xr-x 2 jenkins jenkins 4096 Apr  3 20:59 2
+drwxr-xr-x 2 jenkins jenkins 4096 Apr  3 21:23 3
+drwxr-xr-x 2 jenkins jenkins 4096 Apr  3 21:23 4
+drwxr-xr-x 2 jenkins jenkins 4096 Apr  3 21:23 5
+drwxr-xr-x 2 jenkins jenkins 4096 Apr  3 21:34 6
+drwxr-xr-x 2 jenkins jenkins 4096 Apr  4 20:39 7
+-rw-r--r-- 1 jenkins jenkins    0 Apr  3 19:46 legacyIds
+-rw-r--r-- 1 jenkins jenkins  124 Apr  4 20:39 permalinks
+root@server1:~# 
+```
+
+где мы видим директории с числовыми именами, то есть с нумерацией build-ов.
+
+Чтобы они так много не копились, в конфигурации поставим галочку в "Discard old builds", в "Strategy" - "Log Rotation", в "Max # of builds to keep" поставим, например, 5, то есть будем хранить пять последних build-ов, и нажмём [Save]:
+
+<img src="./images/Screenshot from 2023-04-04 21-16-53.png" />
+
+
+Создадим новый job "Deploy-to-TEST":
+
+<img src="./images/Screenshot from 2023-04-04 21-25-39.png" />
+
+<img src="./images/Screenshot from 2023-04-04 21-29-53.png" />
+
+<img src="./images/Screenshot from 2023-04-04 21-31-27.png" />
+
+В "Build Steps" - "Execute shell" добавим два скрипта:
+
+```
+echo "-----------Build Started-------------"
+cat <<EOF > index.html
+<html>
+<body bgcolor=black>
+<center>
+<h2><font color=yellow>Hello from SergSha</font></h2>
+<font color=blue>www.sergsha.net</font>
+</center>
+</body>
+</html>
+EOF
+echo "-----------Build Finished------------"
+```
+
+<img src="./images/Screenshot from 2023-04-04 22-09-22.png" />
+
+```
+echo "-----------Test Started-------------"
+result=$(grep "Hello" index.html | wc -l)
+echo $result
+if [ "$result" = "1" ]
+then
+    echo "Test Passed"
+    #exit 0
+else
+    echo "Test Failed"
+    exit 1
+fi
+echo "-----------Test Finished------------"
+```
+
+<img src="./images/Screenshot from 2023-04-04 22-10-09.png" />
+
+и нажимаем [Save].
+
+
+Запустим этот job "Deploy-to-TEST" и смотрим результат выполнения:
+
+<img src="./images/Screenshot from 2023-04-04 22-11-39.png" />
+
+Как видим, тест прошёл успешно.
+
+23:44
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
