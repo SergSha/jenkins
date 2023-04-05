@@ -489,6 +489,14 @@ echo "-----------Test Finished------------"
 23:44
 
 
+Теперь будем делать Deployment.
+
+Установим плагин "Publish Over SSH".
+
+
+
+
+
 
 
 
