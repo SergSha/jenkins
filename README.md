@@ -223,7 +223,7 @@ systemctl restart jenkins
 <img src="./images/Screenshot from 2023-04-02 22-52-34.png" />
 
 
-### Просейшие Jobs, включая Deployment
+### Простейшие Jobs, включая Deployment
 
 Создадим новый job. Кликаем на [Create a job]:
 
@@ -239,7 +239,10 @@ systemctl restart jenkins
 <img src="./images/Screenshot from 2023-04-03 19-43-42.png" />
 
 
-Вводим пока Description:
+Вводим пока Description, например:
+```
+This is my first ever Jenkins job!
+```
 
 <img src="./images/Screenshot from 2023-04-03 19-48-47.png" />
 
@@ -709,4 +712,258 @@ Deploy-to-PROD
 Данный job "Deploy-to-PROD" станет неактивным для запуска:
 
 <img src="./images/Screenshot from 2023-04-08 17-16-56.png" />
+
+
+### Добавление Slave | Node | Agent
+
+Предварительно подготовим ещё два сервера node1 и node2. 
+В них должны быть установлены java:
+```
+apt update
+apt install openjdk-11-jre -y
+```
+
+В этих серверах в authorized_keys должны быть добавлены публичные ключи. 
+Отпечатки этих серверов должны быть добавлены в known_hosts ведущего сервера server1. 
+Эти отпечатки можно добавить следующим образом:
+```
+ssh-keyscan -t rsa 192.168.50.111 >> ./.ssh/known_hosts
+ssh-keyscan -t rsa 192.168.50.112 >> ./.ssh/known_hosts
+```
+
+Для добавления нод дополнительно установим плагины "SSH Agent":
+
+<img src="./images/Screenshot from 2023-04-08 17-41-40.png" />
+
+и "SSH Build Agents":
+
+<img src="./images/Screenshot from 2023-04-08 18-43-53.png" />
+
+Заходим в "Manage Jenkins" > "Nodes and Clouds" и кликаем [+ New Node]:
+
+<img src="./images/Screenshot from 2023-04-08 18-15-09.png" />
+
+В поле "Node name":
+```
+Node1
+```
+выбираем "Permanent Agent" и нажимаем [Create]:
+
+<img src="./images/Screenshot from 2023-04-08 18-17-56.png" />
+
+Вводим необходимые поля:
+
+Description
+```
+This is Debian Node-1
+```
+
+Number of executors
+```
+2
+```
+
+Remote root directory
+```
+/root/jenkins/
+```
+
+Labels (Очень важная и нужная вещь! Вводим несколько через пробел)
+```
+debian debian_ansible debian_node1
+```
+
+<img src="./images/Screenshot from 2023-04-08 18-25-31.png" />
+
+Usage (пока оставляем эту опцию)
+```
+Use this node as much as possible
+```
+
+Launch method
+```
+Launch agent via SSH
+```
+
+Host
+```
+192.168.50.111
+```
+
+<img src="./images/Screenshot from 2023-04-08 18-59-34.png" />
+
+В "Credential" кликаем [Add] и выбираем "Jenkins":
+
+<img src="./images/Screenshot from 2023-04-08 19-01-00.png" />
+
+Domain
+```
+Global credentials (unrestricted)
+```
+
+Kind
+```
+SSH Username with private key
+```
+
+Scope
+```
+Global (Jenkins, nodes, items, all child items, etc)
+```
+
+ID (настоятельно рекомендуется указывать)
+```
+ssh-key-sss
+```
+
+Description
+```
+ssh-key-sss
+```
+
+<img src="./images/Screenshot from 2023-04-08 19-11-41.png" />
+
+Username
+```
+root
+```
+
+В "Private Key" выбираем "Enter directly" и в поле "Key" помещаем содержимое приватного ключа для подключения к нодам node1 и node2, кликаем [Add]:
+
+<img src="./images/Screenshot from 2023-04-08 19-17-09.png" />
+
+В "Credentials" из списка выбираем "root (ssh-key-sss)":
+
+<img src="./images/Screenshot from 2023-04-08 19-21-06.png" />
+
+Host Key Verification Strategy
+```
+Manually trusted key Verification Strategy
+```
+
+Availability (оставим как есть)
+```
+Keep this agent online as much as possible
+```
+
+Кликаем [Save]:
+
+<img src="./images/Screenshot from 2023-04-08 19-28-31.png" />
+
+Сервер node1 добавлен в Jenkins:
+
+<img src="./images/Screenshot from 2023-04-08 20-39-36.png" />
+
+
+Аналогичным образом подключаем сервер node2.
+
+В "Manage Jenkins" > "Nodes and Clouds" и кликаем [+ New Node], в поле "Node name":
+```
+Node2
+```
+выбираем "Permanent Agent" и нажимаем [Create]:
+
+<img src="./images/Screenshot from 2023-04-08 20-58-15.png" />
+
+Вводим необходимые поля:
+
+Description
+```
+This is Debian Node-2
+```
+
+Number of executors
+```
+2
+```
+
+Remote root directory
+```
+/root/jenkins/
+```
+
+Labels (Очень важная и нужная вещь! Вводим несколько через пробел)
+```
+debian debian_chef debian_node2
+```
+
+<img src="./images/Screenshot from 2023-04-08 21-00-10.png" />
+
+Usage (пока оставляем эту опцию)
+```
+Use this node as much as possible
+```
+
+Launch method
+```
+Launch agent via SSH
+```
+
+Host
+```
+192.168.50.112
+```
+
+В "Credentials" из списка выбираем "root (ssh-key-sss)":
+
+<img src="./images/Screenshot from 2023-04-08 21-01-00.png" />
+
+Host Key Verification Strategy
+```
+Manually trusted key Verification Strategy
+```
+
+Availability (оставим как есть)
+```
+Keep this agent online as much as possible
+```
+
+Кликаем [Save]:
+
+<img src="./images/Screenshot from 2023-04-08 21-01-31.png" />
+
+Сервер node2 также успешно добавлен в Jenkins:
+
+<img src="./images/Screenshot from 2023-04-08 21-12-10.png" />
+
+
+Запустим job "MyJob-01':
+
+<img src="./images/Screenshot from 2023-04-08 21-36-53.png" />
+
+Как видим, build шёл на мастере Jenkins.
+
+Теперь запустим job "MyJob-01' несколько раз:
+
+<img src="./images/Screenshot from 2023-04-08 22-02-48.png" />
+
+Как видим, build-ы шли и на мастере Jenkins, и на нодах node1, node2.
+
+Настроим, чтобы build-ы шли только на нодах node1 и node2. 
+Для этого в конфигурации job "MyJob-01" поставим галочку в "Restrict where this project can be run", в поле "Label" введём "debian", метка которой есть и на ноде node1, и на ноде node2:
+
+<img src="./images/Screenshot from 2023-04-08 22-08-13.png" />
+
+и кликаем [Save].
+
+Запустим job "MyJob-01' несколько раз:
+
+<img src="./images/Screenshot from 2023-04-08 22-14-47.png" />
+
+Теперь, как видим, build-ы идут только на нодах node1, node2.
+
+Настроим конфигурацию job "MyJob-01", чтобы build-ы шли только на ноде node1. Для этого в поле "Label" оставим только "debian_node1":
+
+<img src="./images/Screenshot from 2023-04-08 22-19-38.png" />
+
+Снова запустим job "MyJob-01' несколько раз:
+
+<img src="./images/Screenshot from 2023-04-08 22-21-30.png" />
+
+Видим, что теперь build-ы идут только на ноде node1.
+
+
+
+
+
 
