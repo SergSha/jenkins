@@ -641,8 +641,72 @@ sudo systemctl reload apache2
 
 <img src="./images/Screenshot from 2023-04-08 15-06-48.png" />
 
+Результат выполнения в консоли:
+
+<img src="./images/Screenshot from 2023-04-08 16-02-37.png" />
 
 
+Изменим в конфигурации job "Deploy-to-TEST" фон страницы с черного на белый:
 
+<img src="./images/Screenshot from 2023-04-08 16-08-40.png" />
 
+кликаем [Save] и снова запускаем job "Deploy-to-TEST".
+
+Обновим страницу в браузере, где должны увидеть смену фона с чёрного на белый:
+
+<img src="./images/Screenshot from 2023-04-08 16-13-48.png" />
+
+Результат выполнения в консоли:
+
+<img src="./images/Screenshot from 2023-04-08 16-15-55.png" />
+
+Как видим, deployment TEST прошёл успешно, теперь сделаем deployment PRODUCTION.
+
+Создадим новый job "Deploy-to-PROD".
+
+Для создания нового job на главной странице кликаем [+ New Item]:
+
+<img src="./images/Screenshot from 2023-04-08 16-21-38.png" />
+
+В поле "Enter an item name" вводим новое название:
+```
+Deploy-to-PROD
+```
+
+В поле "Copy from" выбираем существующий job "Deploy-to-TEST", то есть тем самым создаём новый job "Deploy-to-PROD" на базе job "Deploy-to-TEST", и кликаем [OK]:
+
+<img src="./images/Screenshot from 2023-04-08 16-29-07.png" />
+
+Затем в конфигурации job "Deploy-to-PROD", в секции "Post-build Actions", в поле "Name" в подсекции "SSH Server" изменим с "Deploy-to-TEST" на "Deploy-to-PROD" и нажимаем [Save]:
+
+<img src="./images/Screenshot from 2023-04-08 16-33-43.png" />
+
+Перед тем как запустить новый job "Deploy-to-PROD", для демонстрации изменим цвет шрифта с голубого (blue) на пурпурный (magenta) и нажимаем [Save]:
+
+<img src="./images/Screenshot from 2023-04-08 16-47-03.png" />
+
+Далее на главной странице запустим новый job "Deploy-to-PROD":
+
+<img src="./images/Screenshot from 2023-04-08 16-49-36.png" />
+
+В консоли смотрим результат выполнения:
+
+<img src="./images/Screenshot from 2023-04-08 16-52-23.png" />
+
+В адресной строке браузера вводим ip адрес сервера server3:
+```
+192.168.50.103
+```
+
+<img src="./images/Screenshot from 2023-04-08 16-54-23.png" />
+
+Как видим, всё прошло успешно.
+
+Чтобы случайно не запустить job "Deploy-to-PROD", в конфигурции, в самом верху, переводим переключатель с "Enabled" на "Disabled" и нажимаем [Save]:
+
+<img src="./images/Screenshot from 2023-04-08 17-12-14.png" />
+
+Данный job "Deploy-to-PROD" станет неактивным для запуска:
+
+<img src="./images/Screenshot from 2023-04-08 17-16-56.png" />
 
