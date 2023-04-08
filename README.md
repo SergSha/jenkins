@@ -76,6 +76,9 @@ wget -qO - https://pkg.jenkins.io/debian/jenkins.io-2023.key | cat - > /usr/shar
 echo 'deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/' > /etc/apt/sources.list.d/jenkins.list
 ```
 ```
+apt update
+```
+```
 apt install jenkins
 ```
 
@@ -156,7 +159,7 @@ cat /var/lib/jenkins/secrets/initialAdminPassword
 cd /usr/share/java/
 ```
 
-Переименуем файл jenkins.war, например, в конце имени файла добавим ноиер версии:
+Переименуем файл jenkins.war, например, в конце имени файла добавим номер версии:
 ```
 mv ./jenkins.war ./jenkins-2.397.war 
 ```
@@ -494,16 +497,149 @@ echo "-----------Test Finished------------"
 Установим плагин "Publish Over SSH".
 
 
+Для начала нужно убедиться, что на серверах server2 и server3 установлены и запущены web сервисы, например, apache2 или nginx. 
+Для установки apache2 на debian:
+```
+apt update
+apt install apache2 -y
+```
+
+Файл web-страницы расположен по пути:
+```
+/var/www/html/index.html
+```
+
+Введя ip адрес сервера в строке браузера после установки apache2 web-страница должна выглядеть следующим образом:
+
+<img src="./images/Screenshot from 2023-04-08 08-39-45.png" />
 
 
+Для сервиса Jenkis сгенерируем пару ssh-ключей для подключения к серверам server2 и server3:
+```
+mkdir /var/lib/jenkins/.ssh
+ssh-keygen -t rsa -C "jenkins" -m PEM -P "" -f /var/lib/jenkins/.ssh/id_rsa
+chown -R jenkins: /var/lib/jenkins/.ssh
+```
+Содержимое открытого ключа id_rsa.pub разместим в authorized_keys в серверах server2 и server3.
+
+Чтобы не запрашивало разрешение на подключение к серверам server2 и server3, на Jenkins сервере server1 в файл known_hosts добавим отпечатки от серверов server2 и server3:
+```
+ssh-keyscan -t rsa 192.168.50.102 >> ./.ssh/known_hosts
+ssh-keyscan -t rsa 192.168.50.103 >> ./.ssh/known_hosts
+```
 
 
+Отконфирурируем эти сервера в Jenkins: "Manage Jenkins" > "System", спускаемся до секции "Publish over SSH" и в поле "Path to key" вставим путь до приватного ключа для доступа к серверам server2 и server3:
+```
+/var/lib/jenkins/.ssh/id_rsa
+```
+и в "SSH Servers" кликаем [Add]:
+
+<img src="./images/Screenshot from 2023-04-08 14-38-05.png" />
+
+Заполняем поля для server2:
+
+Name:
+```
+WebServer-TEST
+```
+
+Hostname:
+```
+192.168.50.102
+```
+
+Username:
+```
+root
+```
+
+Remote Directory:
+```
+/var/www/html/
+```
+
+кликаем по "Test Configuration" для проверки подключения к серверу server2, результатом которого должен быть "Success":
+
+<img src="./images/Screenshot from 2023-04-08 14-46-08.png" />
 
 
+Кликаем [Add], чтобы добавить данные для подключения к server3:
+
+Name:
+```
+WebServer-PROD
+```
+
+Hostname:
+```
+192.168.50.103
+```
+
+Username:
+```
+root
+```
+
+Remote Directory:
+```
+/var/www/html/
+```
+
+также кликаем по "Test Configuration" для проверки подключения к серверу server3, результатом которого должен быть "Success":
+
+<img src="./images/Screenshot from 2023-04-08 14-51-00.png" />
 
 
+Кликаем [Save]
 
 
+Заходим в конфигурацию job "Deploy-to-Test": "Deploy-to-TEST' > "Configure" и в самом внизу, в секции "Post-build Actions" (если этот шаг будет последним), кликаем [Add post-build action]:
+
+<img src="./images/Screenshot from 2023-04-08 08-55-19.png" />
+
+Из списка выбираем "Send build artifacts over SSH":
+
+<img src="./images/Screenshot from 2023-04-08 08-58-28.png" />
+
+
+В случае, если этот шаг будет НЕ последним, то можно воспользоваться тем же [Add build step] и из списка выбираем "Send files or execute commands over SSH":
+
+<img src="./images/Screenshot from 2023-04-08 09-06-35.png" />
+
+
+Заполняем необходимые поля:
+
+Name
+```
+WebServer-TEST
+```
+
+Source files
+```
+*
+```
+
+<img src="./images/Screenshot from 2023-04-08 14-58-37.png" />
+
+Exec command
+```
+sudo systemctl reload apache2
+```
+
+и кликаем [Save]:
+
+<img src="./images/Screenshot from 2023-04-08 15-03-19.png" />
+
+
+Теперь запускаем job "Deploy-to-TEST".
+
+В адресной строке браузера вводим:
+```
+192.168.50.102
+```
+
+<img src="./images/Screenshot from 2023-04-08 15-06-48.png" />
 
 
 
