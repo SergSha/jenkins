@@ -1176,6 +1176,7 @@ sleep 7</command>
   </builders>
   <publishers/>
   <buildWrappers/>
+</project>
 ```
 
 Для демонстрации внесём изменение в этом файле:
@@ -1211,6 +1212,7 @@ sleep 7</command>
   </builders>
   <publishers/>
   <buildWrappers/>
+</project>
 ```
 
 Создадим новый job "MyJobFromCLI", импортировав с изменённого xml-файла MyJob-01:
