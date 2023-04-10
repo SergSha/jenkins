@@ -963,6 +963,276 @@ Keep this agent online as much as possible
 Видим, что теперь build-ы идут только на ноде node1.
 
 
+### Удалённое и локальное управление через Jenkins CLI Client
+
+Заходим в "Manage Jenkins" > "Jenkins CLI" и видим строку Jenkins CLI и ниже список команд:
+```
+java -jar jenkins-cli.jar -s http://192.168.50.101:8080/ help
+```
+
+<img src="./images/Screenshot from 2023-04-10 19-25-47.png" />
+
+Нажав по ссылке "jenkins-cli.jar" скачается файл jenkins-cli.jar на наш компьютер:
+```
+http://192.168.50.101:8080/jnlpJars/jenkins-cli.jar
+```
+
+Скачаем этот файл локально на Jenkins сервере server1:
+```
+wget localhost:8080/jnlpJars/jenkins-cli.jar
+```
+
+Запустим команду:
+```
+ls -lh
+```
+получаем вывод:
+```
+total 3.3M
+-rw-r--r-- 1 root root 3.3M Apr  7 22:12 jenkins-cli.jar
+```
+
+Для запуска jenkins cli команды локально используется следующий образец, например, для команды who-am-i:
+```
+java -jar jenkins-cli.jar -auth username:password -s http://localhost:8080 who-am-i
+```
+
+Создадим нового пользователя, например, serviceuser паролем password123 для демонстрации.
+
+Для этого зайдем в "Manage Jenkins" > "Users"
+
+Кликаем [+ Create User]:
+
+<img src="./images/Screenshot from 2023-04-10 19-49-31.png" />
+
+Заполняем необходимые поля:
+
+Username
+```
+serviceuser
+```
+
+Password
+```
+password123
+```
+
+Confirm password
+```
+password123
+```
+
+Full name
+```
+Service User
+```
+
+E-mail address
+```
+service@something.net
+```
+
+и жмём [Create User]
+
+<img src="./images/Screenshot from 2023-04-10 20-03-39.png" />
+
+<img src="./images/Screenshot from 2023-04-10 20-23-16.png" />
+
+Попробуем запустить jenkins cli команду:
+```
+java -jar jenkins-cli.jar -auth serviceuser:password123 -s http://localhost:8080 who-am-i
+```
+получаем вывод:
+```
+Authenticated as: serviceuser
+Authorities:
+  authenticated
+```
+
+Вместо пароля обычно используется API токен.
+
+Чтобы создать токен для пользователя serviceuser, нужно залогиниться под его именем
+
+<img src="./images/Screenshot from 2023-04-10 20-24-36.png" />
+
+Заходим в "Manage Jenkins" > "Users", в конфигурацию пользователя serviceuser
+
+<img src="./images/Screenshot from 2023-04-10 20-28-59.png" />
+
+в секции "API Token" кликаем [Add new Token]
+
+<img src="./images/Screenshot from 2023-04-10 20-32-26.png" />
+
+В поле вводим, например
+```
+token-01
+```
+и жмём [Generate]
+
+<img src="./images/Screenshot from 2023-04-10 20-36-04.png" />
+
+скопируем полученный токен
+```
+11d3cdc14c8502215755b3aa8b1fb6ba6e
+```
+
+<img src="./images/Screenshot from 2023-04-10 20-37-13.png" />
+
+Теперь повторим в консоли предыдущую команду, но вместо пароля используем токен:
+```
+java -jar jenkins-cli.jar -auth serviceuser:11d3cdc14c8502215755b3aa8b1fb6ba6e -s http://localhost:8080 who-am-i
+```
+как видим, вывел тот же результат:
+```
+Authenticated as: serviceuser
+Authorities:
+  authenticated
+```
+
+Чтобы каждый раз не вписывать пользователь и токен, воспользуем Environment variables: 
+Установка Credential в Linux:
+```
+export JENKINS_USER_ID=serviceuser
+export JENKINS_API_TOKEN=11d3cdc14c8502215755b3aa8b1fb6ba6e
+```
+Убедимся, что они экспортировались:
+```
+env | grep JENKINS
+```
+на экране отобразилось следующее:
+```
+JENKINS_API_TOKEN=11d3cdc14c8502215755b3aa8b1fb6ba6e
+JENKINS_USER_ID=serviceuser
+```
+Теперь в консоли можем повторно запустить предыдущую команду, но без параметра -auth:
+```
+java -jar jenkins-cli.jar -s http://localhost:8080 who-am-i
+```
+
+Теперь запустим jenkins cli команду НЕ локально, а удалённо.
+
+Скачаем jenkins-cli.jar:
+```
+wget http://192.168.50.101:8080/jnlpJars/jenkins-cli.jar
+```
+Также экспортируем необходимые переменные:
+```
+export JENKINS_USER_ID=serviceuser
+export JENKINS_API_TOKEN=11d3cdc14c8502215755b3aa8b1fb6ba6e
+```
+
+В Powershell (в ОС Windows) переменные экспортируются следующим образом:
+Установка Credential в Windows Powershell:
+```
+$env:JENKINS_USER_ID="serviceuser"
+$env:export JENKINS_API_TOKEN="11d3cdc14c8502215755b3aa8b1fb6ba6e"
+```
+
+Запустим в консоли команду:
+```
+java -jar jenkins-cli.jar -s http://192.168.50.101:8080 who-am-i
+```
+на экран вывел тот же результат:
+```
+Authenticated as: serviceuser
+Authorities:
+  authenticated
+```
+
+Сохраним job "MyJob-01" в xml-файл:
+```
+java -jar jenkins-cli.jar -s http://192.168.50.101:8080 get-job MyJob-01 > MyJob-01.xml
+```
+Содержимое файла MyJob-01:
+```
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This is my first ever Jenkins job!</description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>debian_node1</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo &quot;Hello World!&quot;
+echo &quot;This is Build number $BUILD_NUMBER&quot;
+pwd
+sleep 7
+whoami
+sleep 7
+echo &quot;Nmae of this Build is $BUILD_DISPLAY_NAME&quot;
+ip address
+hostname
+sleep 7</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+```
+
+Для демонстрации внесём изменение в этом файле:
+```
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This is my first ever Jenkins job!</description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>debian_node1</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo &quot;Hello World! This string added from XML file and imported via CLI&quot;
+echo &quot;This is Build number $BUILD_NUMBER&quot;
+pwd
+sleep 7
+whoami
+sleep 7
+echo &quot;Nmae of this Build is $BUILD_DISPLAY_NAME&quot;
+ip address
+hostname
+sleep 7</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+```
+
+Создадим новый job "MyJobFromCLI", импортировав с изменённого xml-файла MyJob-01:
+```
+java -jar jenkins-cli.jar -s http://192.168.50.101:8080 create-job MyJobFromCLI < MyJob-01.xml
+```
+
+В случае в Poweshell (ОС Windows):
+```
+Get-Content MyJob-01.xml | java -jar jenkins-cli.jar -s http://192.168.50.101:8080 create-job MyJobFromCLI
+```
+
+На главной странице увидим только что созданный job "MyJobFromCLI"
+
+<img src="./images/Screenshot from 2023-04-10 21-36-24.png" />
+
+Запустим этот новый job "MyJobFromCLI" и посмотрим результат выполнения:
+
+<img src="./images/Screenshot from 2023-04-10 21-40-51.png" />
+
+
+
 
 
 
