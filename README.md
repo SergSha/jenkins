@@ -1125,7 +1125,7 @@ export JENKINS_API_TOKEN=11d3cdc14c8502215755b3aa8b1fb6ba6e
 Установка Credential в Windows Powershell:
 ```
 $env:JENKINS_USER_ID="serviceuser"
-$env:export JENKINS_API_TOKEN="11d3cdc14c8502215755b3aa8b1fb6ba6e"
+$env:JENKINS_API_TOKEN="11d3cdc14c8502215755b3aa8b1fb6ba6e"
 ```
 
 Запустим в консоли команду:
