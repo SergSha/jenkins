@@ -1234,6 +1234,112 @@ Get-Content MyJob-01.xml | java -jar jenkins-cli.jar -s http://192.168.50.101:80
 <img src="./images/Screenshot from 2023-04-10 21-40-51.png" />
 
 
+### Деплоим из GitHub
+
+В GitHub.com создадим новый репозиторий:
+Repository name
+```
+app-for-jenkins
+```
+Description (optional)
+```
+Application for Jenkins demonstration
+```
+
+<img src="./images/Screenshot from 2023-04-11 21-17-16.png" />
+
+Для подключения к GitHub.com воспользуемся ранее сгенерированными ssh-ключами.
+
+Для подключения к GitHub.com сгенерируем пару ssh-ключей:
+```
+ssh-keygen -q -P '' -f ~/.ssh/jenkins
+```
+Содержимое публичного ключа:
+```
+cat ~/.ssh/jenkins.pub 
+```
+разместим в настройках аккаунта GitHub.com:
+
+<img src="./images/Screenshot from 2023-04-11 22-55-36.png" />
+
+А содержимое приватного ключа разместим в настройке Credential Jenkins.
+
+Заходим в конфигурации job, например, "Deploy-to-PROD", в секции "Source Code Management" помечаем радиоточкой "Git" и заполняем необходимые поля:
+Repository URL
+```
+git@github.com:SergSha/app-for-jenkins.git
+```
+Кликаем по кнопке [Add] и из списка выбираем "Jenkins"
+
+<img src="./images/Screenshot from 2023-04-11 22-14-46.png" />
+
+Далее заполняем поля:
+Domain
+```
+Global credentials (unrestricted)
+```
+
+Kind
+```
+SSH Username with private key
+```
+
+Scope
+```
+Global (Jenkins, nodes, items, all child items, etc)
+```
+
+ID (настоятельно рекомендуется указывать)
+```
+ssh-key-github
+```
+
+Description
+```
+ssh-key-github
+```
+
+<img src="./images/Screenshot from 2023-04-11 22-29-15.png" />
+
+Username
+```
+SergSha
+```
+
+12:20
+
+
+
+
+
+
+В "Private Key" выбираем "Enter directly" и в поле "Key" помещаем содержимое приватного ключа для подключения к GitHub.com, кликаем [Add]:
+
+<img src="./images/Screenshot from 2023-04-11 23-04-47.png" />
+
+В "Credentials" из списка выбираем "sergsha (ssh-key-github)":
+
+<img src="./images/Screenshot from 2023-04-08 19-21-06.png" />
+
+Host Key Verification Strategy
+```
+Manually trusted key Verification Strategy
+```
+
+Availability (оставим как есть)
+```
+Keep this agent online as much as possible
+```
+
+Кликаем [Save]:
+
+<img src="./images/Screenshot from 2023-04-08 19-28-31.png" />
+
+
+
+
+
+
 
 
 
