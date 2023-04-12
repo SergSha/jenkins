@@ -1264,7 +1264,38 @@ cat ~/.ssh/jenkins.pub
 
 А содержимое приватного ключа разместим в настройке Credential Jenkins.
 
-Заходим в конфигурации job, например, "Deploy-to-PROD", в секции "Source Code Management" помечаем радиоточкой "Git" и заполняем необходимые поля:
+На своём компе склонируем только что созданный репозиторий "app-for-jenkins":
+```
+git clone git@github.com:SergSha/app-for-jenkins.git
+```
+
+Перейдём в этот директорий:
+```
+cd ./app-for-jenkins/
+```
+
+Создадим файл index.html:
+```
+cat <<EOF > index.html
+<html>
+<body bgcolor=white>
+<center>
+<h2><font color=yellow>Hello from SergSha</font></h2>
+<font color=magenta>www.sergsha.net</font>
+</center>
+</body>
+</html>
+EOF
+```
+
+Зальём этот файл в репозиторий GitHub.com:
+```
+git add index.html
+git commit -m "Added index.html"
+git push -u origin main
+```
+
+На главной странице Jenkins заходим в конфигурации job, например, "Deploy-to-PROD", в секции "Source Code Management" помечаем радиоточкой "Git" и заполняем необходимые поля:
 Repository URL
 ```
 git@github.com:SergSha/app-for-jenkins.git
