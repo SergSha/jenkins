@@ -1341,38 +1341,141 @@ SergSha
 
 
 
-
-
-
 В "Private Key" выбираем "Enter directly" и в поле "Key" помещаем содержимое приватного ключа для подключения к GitHub.com, кликаем [Add]:
 
 <img src="./images/Screenshot from 2023-04-11 23-04-47.png" />
 
 В "Credentials" из списка выбираем "sergsha (ssh-key-github)":
 
-<img src="./images/Screenshot from 2023-04-08 19-21-06.png" />
+<img src="./images/Screenshot from 2023-04-13 21-08-24.png" />
 
-Host Key Verification Strategy
+Далее в секции "Build Steps", в первом "Execute shell" изменим скрипт на следующее содержимое:
 ```
-Manually trusted key Verification Strategy
+echo "-----------Build Started-------------"
+ls -la
+cat index.html
+echo "Build by Jenkins Build# $BUILD_ID" >> index.html
+cat index.html
+echo "-----------Build Finished------------"
+```
+и нажимаем [Save]
+
+<img src="./images/Screenshot from 2023-04-13 21-47-05.png" />
+
+На главной странице Jenkins запустим изменённый job "Deploy-to-PROD".
+
+В консоли вывел такой результат:
+```
+Started by user SergSha
+Running as SYSTEM
+Building on the built-in node in workspace /var/lib/jenkins/workspace/Deploy-to-PROD
+The recommended git tool is: NONE
+using credential ssh-key-github
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/Deploy-to-PROD/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url git@github.com:SergSha/app-for-jenkins.git # timeout=10
+Fetching upstream changes from git@github.com:SergSha/app-for-jenkins.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.30.2'
+using GIT_SSH to set credentials ssh-key-github
+Verifying host key using known hosts file
+ > git fetch --tags --force --progress -- git@github.com:SergSha/app-for-jenkins.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 4f57de40d09336f2608dfa676b8d21fdd538510f (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 4f57de40d09336f2608dfa676b8d21fdd538510f # timeout=10
+Commit message: "Added index.html"
+ > git rev-list --no-walk 4f57de40d09336f2608dfa676b8d21fdd538510f # timeout=10
+[Deploy-to-PROD] $ /bin/sh -xe /tmp/jenkins15882895239292801257.sh
++ echo -----------Build Started-------------
+-----------Build Started-------------
++ ls -la
+total 16
+drwxr-xr-x 3 jenkins jenkins 4096 Apr 13 21:43 .
+drwxr-xr-x 7 jenkins jenkins 4096 Apr 13 21:27 ..
+drwxr-xr-x 8 jenkins jenkins 4096 Apr 13 21:47 .git
+-rw-r--r-- 1 jenkins jenkins  160 Apr 13 21:43 index.html
++ cat index.html
+<html>
+<body bgcolor=white>
+<center>
+<h2><font color=yellow>Hello from SergSha</font></h2>
+<font color=magenta>www.sergsha.net</font>
+</center>
+</body>
+</html>
++ echo Build by Jenkins Build# 5
++ cat index.html
+<html>
+<body bgcolor=white>
+<center>
+<h2><font color=yellow>Hello from SergSha</font></h2>
+<font color=magenta>www.sergsha.net</font>
+</center>
+</body>
+</html>
+Build by Jenkins Build# 5
++ echo -----------Build Finished------------
+-----------Build Finished------------
+[Deploy-to-PROD] $ /bin/sh -xe /tmp/jenkins10024544456803624342.sh
++ echo -----------Test Started-------------
+-----------Test Started-------------
++ grep Hello index.html
++ wc -l
++ result=1
++ echo 1
+1
++ [ 1 = 1 ]
++ echo Test Passed
+Test Passed
++ echo -----------Test Finished------------
+-----------Test Finished------------
+SSH: Connecting from host [server1]
+SSH: Connecting with configuration [WebServer-PROD] ...
+SSH: EXEC: completed after 214 ms
+SSH: Disconnecting configuration [WebServer-PROD] ...
+SSH: Transferred 1 file(s)
+Finished: SUCCESS
 ```
 
-Availability (оставим как есть)
+В адресной строке браузера вводим ip адрес веб-сервера server1:
 ```
-Keep this agent online as much as possible
+192.168.50.103
 ```
 
-Кликаем [Save]:
+отобразится следующая страница:
 
-<img src="./images/Screenshot from 2023-04-08 19-28-31.png" />
-
-
+<img src="./images/Screenshot from 2023-04-13 21-52-09.png" />
 
 
+Поменяем цвет фона, например, на голубой:
+```
+nano ./index.html
+```
+```
+<html>
+<body bgcolor=blue>
+<center>
+<h2><font color=yellow>Hello from SergSha</font></h2>
+<font color=magenta>www.sergsha.net</font>
+</center>
+</body>
+</html>
+```
+Снова зальём в наш репозиторий:
+```
+git add index.html
+git commit -m "Changed background color"
+git push -u origin main
+```
+и запустим наш job "Deploy-to-PROD".
+
+Обновим страницу обраузера и увидим изменённую веб-страницу:
+
+<img src="./images/Screenshot from 2023-04-13 22-08-10.png" />
 
 
-
-
+### Автоматизация запуска Build Job из GitHub - Jenkins Build Triggers
 
 
 
