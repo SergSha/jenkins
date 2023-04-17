@@ -1477,5 +1477,161 @@ git push -u origin main
 
 ### Автоматизация запуска Build Job из GitHub - Jenkins Build Triggers
 
+1. Trigger builds remotely (e.g., from scripts)
+
+Создадим новый job "Build-AutoTrigger-1":
+
+<img src="./images/Screenshot from 2023-04-17 21-07-46.png" />
+
+В секции "Build Steps" для демонстрации добавим какой-нибудь скрипт, например:
+```
+sleep 5
+echo "Hello World"
+sleep 5
+echo "Build id: $BUILD_ID"
+```
+<img src="./images/Screenshot from 2023-04-17 21-17-00.png" />
+
+В секции "Build Triggers" ставим галочку в "Trigger builds remotely (e.g., from scripts)" и заполним поле "Authentication Token" случайным набором букв и цифр как можно длиннее:
+```
+byy46gb66byjyg6mjhjlbhjvy63hgfchgz1dnhm8mnts
+```
+и нажимаем [Save]
+
+<img src="./images/Screenshot from 2023-04-17 21-22-42.png" />
+
+В адресной строке браузера вводим ссылку следующего образца:
+```
+JENKINS_URL/job/Build-AutoTrigger-1/build?token=TOKEN_NAME
+```
+то есть в нашем случае
+```
+http://192.168.50.101:8080/job/Build-AutoTrigger-1/build?token=byy46gb66byjyg6mjhjlbhjvy63hgfchgz1dnhm8mnts
+```
+этим самым мы с браузера запустим наш новый job "Build-AutoTrigger-1"
+
+<img src="./images/Screenshot from 2023-04-17 21-29-52.png" />
+
+<img src="./images/Screenshot from 2023-04-17 21-29-57.png" />
+
+Результат выполнения из "Console Output":
+```
+Started by remote host 192.168.50.1
+Running as SYSTEM
+Building on the built-in node in workspace /var/lib/jenkins/workspace/Build-AutoTrigger-1
+[Build-AutoTrigger-1] $ /bin/sh -xe /tmp/jenkins16918272073197248091.sh
++ sleep 5
++ echo Hello World
+Hello World
++ sleep 5
++ echo Build id: 1
+Build id: 1
+Finished: SUCCESS
+```
+
+Для того чтобы запустить из консоли терминала, сначала создадим API token пользователя. 
+Зайдём в настройки пользователя "SergSha" > "Configure", в секции "API Token" добавим новый токен, например, назовём:
+```
+TRIGGER-TOKEN
+```
+нажимаем "Generate", получим
+```
+111d1b457f6e5f2f8e63fd90c4627e4260
+```
+В окне терминала вводим команду следующего образца:
+```
+USER:TOKEN@JENKINS_URL/job/Build-AutoTrigger-1/build?token=TOKEN_NAME
+```
+то есть в нашем случае:
+```
+curl http://sergsha:111d1b457f6e5f2f8e63fd90c4627e4260@192.168.50.101:8080/job/Build-AutoTrigger-1/build?token=byy46gb66byjyg6mjhjlbhjvy63hgfchgz1dnhm8mnts
+```
+и мы увидим, что job "Buil-AutoTrigger-1" запустился
+
+<img src="./images/Screenshot from 2023-04-17 21-48-46.png" />
+
+
+2. Build after other projects are built
+
+На основе job "Build-AutoTrigger-1" создадим новый job "Build-AutoTrigger-2":
+
+<img src="./images/Screenshot from 2023-04-17 21-57-02.png" />
+
+В секции "Build Triggers" ставим галочку в "Build after other projects are built", в поле "Projects to watch" выбираем job, после которого должен запуститься наш новый job:
+```
+Build-AutoTrigger-1
+```
+и ставим радиоточку "Trigger only if build is stable", то есть есть наш новый запусттится в случае успешного завершения предыдущего job, нажимаем [Save]
+
+<img src="./images/Screenshot from 2023-04-17 22-05-58.png" />
+
+Запускаем job "Build-AutoTrigger-1"
+
+<img src="./images/Screenshot from 2023-04-17 22-06-57.png" />
+
+Видим, что после успешного завершения job "Build-AutoTrigger-1" запустился job "Build-AutoTrigger-2"
+
+<img src="./images/Screenshot from 2023-04-17 22-09-56.png" />
+
+<img src="./images/Screenshot from 2023-04-17 22-10-08.png" />
+
+Результат из "Console Output":
+```
+Started by upstream project "Build-AutoTrigger-1" build number 3
+originally caused by:
+ Started by user SergSha
+Running as SYSTEM
+Building on the built-in node in workspace /var/lib/jenkins/workspace/Build-AutoTrigger-2
+[Build-AutoTrigger-2] $ /bin/sh -xe /tmp/jenkins15308377170844319628.sh
++ sleep 5
++ echo Hello World
+Hello World
++ sleep 5
++ echo Build id: 1
+Build id: 1
+Finished: SUCCESS
+```
+
+3. 
+
+На основе job "Build-AutoTrigger-1" создадим новый job "Build-AutoTrigger-3":
+
+<img src="./images/Screenshot from 2023-04-17 22-18-36.png" />
+
+В секции "Build Triggers" ставим галочку в "Build periodically", в поле "Schedule" записываем расписание запуска, например, каждые две минуты:
+```
+H/2 * * * *
+```
+и нажимаем [Save]
+
+<img src="./images/Screenshot from 2023-04-17 22-25-25.png" />
+
+Ждём в течение нескольких минут, чтобы увидеть, что каждые две минуты запускается job "Build-AutoTrigger-3"
+
+<img src="./images/Screenshot from 2023-04-17 22-35-11.png" />
+
+В "Console Output":
+```
+Started by timer
+Running as SYSTEM
+Building remotely on Node2 (debian debian_chef debian_node2) in workspace /root/jenkins/workspace/Build-AutoTrigger-3
+[Build-AutoTrigger-3] $ /bin/sh -xe /tmp/jenkins11800635891986572429.sh
++ sleep 5
++ echo Hello World
+Hello World
++ sleep 5
++ echo Build id: 4
+Build id: 4
+Finished: SUCCESS
+```
+
+16:44
+
+
+
+
+
+
+
 
 
