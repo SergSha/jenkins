@@ -1592,7 +1592,7 @@ Build id: 1
 Finished: SUCCESS
 ```
 
-3. 
+3. Build periodically
 
 На основе job "Build-AutoTrigger-1" создадим новый job "Build-AutoTrigger-3":
 
@@ -1627,8 +1627,94 @@ Finished: SUCCESS
 
 16:44
 
+4. Build after other projects are built
 
+Создадим новый job "Build-AutoTrigger-4":
 
+<img src="./images/Screenshot from 2023-04-18 20-01-34.png" />
+
+В секции "Build Triggers" ставим галочку в "Poll SCM", в поле "Schedule" записываем расписание запуска, например, каждую минуту:
+```
+* * * * *
+```
+<img src="./images/Screenshot from 2023-04-18 21-00-20.png" />
+
+В секции "Source Code Management" радиоточку ставим в "Git", заполняем небходимые поля:
+Repository URL:
+```
+git@github.com:SergSha/app-for-jenkins.git
+```
+Credentials:
+```
+sergsha (ssh-key-github)
+```
+<img src="./images/Screenshot from 2023-04-18 20-33-19.png" />
+
+В секции "Build Steps" добавим в несколько строк скрипт:
+```
+#-------------
+sleep 10
+ls -la
+#-------------
+```
+и нажимаем [Save]
+
+<img src="./images/Screenshot from 2023-04-18 20-42-13.png" />
+
+Изменим что-нибудь в GitHubе, чтобы увидеть прохождение build-а job "Build-AutoTrigger-4":
+```
+nano ./index.html 
+```
+к примеру, изменим цвет заголовка с жёлтого на красный:
+```
+<html>
+<body bgcolor=blue>
+<center>
+<h2><font color=red>Hello from SergSha</font></h2>
+<font color=magenta>www.sergsha.net</font>
+</center>
+</body>
+</html>
+```
+и запушим в GitHub:
+```
+git add ./index.html 
+git commit -m "Change color for heading"
+git push -u origin main
+```
+После этого build "Build-AutoTrigger-4" в течение минуты запустился и в "Console Output" вывел результат:
+```
+Started by an SCM change
+Running as SYSTEM
+Building on the built-in node in workspace /var/lib/jenkins/workspace/Build-AutoTrigger-4
+The recommended git tool is: NONE
+using credential ssh-key-github
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/Build-AutoTrigger-4/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url git@github.com:SergSha/app-for-jenkins.git # timeout=10
+Fetching upstream changes from git@github.com:SergSha/app-for-jenkins.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.30.2'
+using GIT_SSH to set credentials ssh-key-github
+Verifying host key using known hosts file
+ > git fetch --tags --force --progress -- git@github.com:SergSha/app-for-jenkins.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 2a478cf2beded3b385c3b2e398963c4d208d793e (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 2a478cf2beded3b385c3b2e398963c4d208d793e # timeout=10
+Commit message: "Change color for heading"
+First time build. Skipping changelog.
+[Build-AutoTrigger-4] $ /bin/sh -xe /tmp/jenkins16505843930355711426.sh
++ sleep 10
++ ls -la
+total 16
+drwxr-xr-x  3 jenkins jenkins 4096 Apr 18 21:06 .
+drwxr-xr-x 11 jenkins jenkins 4096 Apr 18 21:01 ..
+drwxr-xr-x  8 jenkins jenkins 4096 Apr 18 21:06 .git
+-rw-r--r--  1 jenkins jenkins  156 Apr 18 21:06 index.html
+Finished: SUCCESS
+```
+После этого build не запустится, пока не внесут изменение в GitHub.
 
 
 
